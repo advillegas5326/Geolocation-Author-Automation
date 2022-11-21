@@ -109,6 +109,7 @@ def create_execution_variables():
 
             complete_countries.append((initial_db, country, input_language, table_results,
                                       final_table_path, cities_table, path_to_save, save_name))
+        return complete_countries
     else:
         database = "author_weekly"
         path_to_save = "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks"
@@ -155,6 +156,7 @@ def create_execution_variables():
 
 
 def complement_or_complete_data(table_results, initial_db, final_table_path, path_to_save, save_name):
+
     if(is_author == "False"):
         temp_table = "geolocation_weekly"
     else:
@@ -238,9 +240,9 @@ def send_telegram_error(text):
 
 try:
     countries_array = getting_data()
-except NameError:
-    print(NameError)
-    send_telegram_error(NameError)
+except Exception as e:
+    print(e)
+    send_telegram_error(e)
 
 
 # COMMAND ----------
