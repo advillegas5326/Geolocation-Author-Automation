@@ -278,8 +278,9 @@ def getting_data():
 
         temp_table = "author_weekly"
         for x, country in enumerate(countries_array):
-            print(f"\ncountry: {country[0][0]}\n")
-            print("AUTHOR\n")
+            print("------------------------------------------------")
+            print(f"\n-----COUNTRY: {country[0][1]}\n")
+            print("-------AUTHOR\n")
 
             file_path, non_analyzed_dataframe = complement_or_complete_data("author_weekly",
                                                                             country[0][3], country[0][0], country[0][4], country[0][6], country[0][7])
@@ -289,7 +290,7 @@ def getting_data():
             countries_array[x][0] = countries_array[x][0] + \
                 (non_analyzed_dataframe.shape[0],)
 
-            print("GEOLOCATION\n")
+            print("\n-------GEOLOCATION\n")
 
             file_path, non_analyzed_dataframe = complement_or_complete_data("geolocation_weekly",
                                                                             country[1][3], country[1][0], country[1][4], country[1][6], country[1][7])
