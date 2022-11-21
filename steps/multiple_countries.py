@@ -110,7 +110,7 @@ def create_execution_variables():
             complete_countries.append((initial_db, country, input_language, table_results,
                                       final_table_path, cities_table, path_to_save, save_name))
         return complete_countries
-    else:
+    elif(is_author == "True"):
         database = "author_weekly"
         path_to_save = "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks"
         today = datetime.datetime.now()
@@ -153,14 +153,62 @@ def create_execution_variables():
             complete_countries.append((initial_db, country, input_language, table_results,
                                       final_table_path, cities_table, path_to_save, save_name))
         return complete_countries
-
-
-def complement_or_complete_data(table_results, initial_db, final_table_path, path_to_save, save_name):
-
-    if(is_author == "False"):
-        temp_table = "geolocation_weekly"
     else:
-        temp_table = "author_weekly"
+
+        country_array = country_prediction.split(",")
+        complete_countries = []
+        for country in country_array:
+
+            today = datetime.datetime.now()
+            if(manual_month == "False"):
+                month = today.strftime('%B').lower()
+            else:
+                month = dbutils.widgets.get("month")
+
+            initial_db = f"pei.{country}_full_data_table_{month}"
+            save_name = f"{country}_{month}_{today.year}{today.month}{today.day}"
+
+            if (country == "brazil"):
+                input_language = "pt"
+                cities_table = "20220811_br_clustered_cities.csv"
+            elif (country == "global"):
+                input_language = "en"
+                cities_table = "20220719_us_clustered_cities.csv"
+            elif (country == "japan"):
+                input_language = "jp"
+                cities_table = "20220719_us_clustered_cities.csv"
+            elif (country == "germany"):
+                input_language = "de"
+                cities_table = "20220719_us_clustered_cities.csv"
+            elif (country == "france"):
+                input_language = "fr"
+                cities_table = "20220719_us_clustered_cities.csv"
+            elif (country == "mexico" or country == "chile"):
+                input_language = "es"
+                cities_table = "20220714_cl_clustered_cities.csv"
+            elif (country == "russia"):
+                input_language = "ru"
+                cities_table = "20220719_us_clustered_cities.csv"
+            else:
+                raise Exception(f"Language {input_language} is not supported")
+
+            #table_results = f"author_{month}_{country}"
+            #final_table_path = f"{database}.{table_results}"
+
+            complete_countries.append([(initial_db, country, input_language, f"author_{month}_{country}",
+                                      f"author_weekly.{table_results}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks", save_name),
+                                       (initial_db, country, input_language, f"geolocation_{month}_{country}",
+                                       f"geolocation_weekly.{table_results}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks", save_name)])
+        return complete_countries
+
+
+def complement_or_complete_data(temp_table, table_results, initial_db, final_table_path, path_to_save, save_name):
+
+    # if(is_author == "False"):
+    #     temp_table = "geolocation_weekly"
+    # else:
+    #     temp_table = "author_weekly"
+
     if not DeltaTable.isDeltaTable(spark, f'/user/hive/warehouse/{temp_table}.db/{table_results}'):
         non_analyzed_dataframe = spark.sql(
             "select * from {}".format(initial_db)).toPandas()
@@ -194,19 +242,63 @@ def getting_data():
 
     # Get data of all global countries + non analyzed
     print("\n------------------------Getting Data-------------------------\n")
-    for x, country in enumerate(countries_array):
-        print(f"\ncountry: {country[1]}\n")
-        file_path, non_analyzed_dataframe = complement_or_complete_data(
-            country[3], country[0], country[4], country[6], country[7])
-        countries_array[x] = countries_array[x] + (file_path,)
-        countries_array[x] = countries_array[x] + (non_analyzed_dataframe,)
-        countries_array[x] = countries_array[x] + \
-            (non_analyzed_dataframe.shape[0],)
+    if(is_author == "False"):
 
-    # Ordenar de menos records a más records
-    countries_array.sort(key=lambda records: records[10])
+        temp_table = "geolocation_weekly"
+        for x, country in enumerate(countries_array):
+            print(f"\ncountry: {country[1]}\n")
+            file_path, non_analyzed_dataframe = complement_or_complete_data(temp_table,
+                                                                            country[3], country[0], country[4], country[6], country[7])
+            countries_array[x] = countries_array[x] + (file_path,)
+            countries_array[x] = countries_array[x] + (non_analyzed_dataframe,)
+            countries_array[x] = countries_array[x] + \
+                (non_analyzed_dataframe.shape[0],)
+        # Ordenar de menos records a más records
+        countries_array.sort(key=lambda records: records[10])
 
-    return countries_array
+        return countries_array
+
+    elif(is_author == "True"):
+
+        temp_table = "author_weekly"
+        for x, country in enumerate(countries_array):
+            print(f"\ncountry: {country[1]}\n")
+            file_path, non_analyzed_dataframe = complement_or_complete_data(temp_table,
+                                                                            country[3], country[0], country[4], country[6], country[7])
+            countries_array[x] = countries_array[x] + (file_path,)
+            countries_array[x] = countries_array[x] + (non_analyzed_dataframe,)
+            countries_array[x] = countries_array[x] + \
+                (non_analyzed_dataframe.shape[0],)
+        # Ordenar de menos records a más records
+        countries_array.sort(key=lambda records: records[10])
+
+        return countries_array
+
+    else:
+
+        temp_table = "author_weekly"
+        for x, country in enumerate(countries_array):
+            print(f"\ncountry: {country[1]}\n")
+            file_path, non_analyzed_dataframe = complement_or_complete_data("author_weekly",
+                                                                            country[0][3], country[0][0], country[0][4], country[0][6], country[0][7])
+            countries_array[x][0] = countries_array[x][0] + (file_path,)
+            countries_array[x][0] = countries_array[x][0] + \
+                (non_analyzed_dataframe,)
+            countries_array[x][0] = countries_array[x][0] + \
+                (non_analyzed_dataframe.shape[0],)
+
+            file_path, non_analyzed_dataframe = complement_or_complete_data("geolocation_weekly",
+                                                                            country[1][3], country[1][0], country[1][4], country[1][6], country[1][7])
+            countries_array[x][1] = countries_array[x][1] + (file_path,)
+            countries_array[x][1] = countries_array[x][1] + \
+                (non_analyzed_dataframe,)
+            countries_array[x][1] = countries_array[x][1] + \
+                (non_analyzed_dataframe.shape[0],)
+
+        # Ordenar de menos records a más records
+        countries_array.sort(key=lambda records: records[0][10])
+
+        return countries_array
 
 
 def send_to_api(data):

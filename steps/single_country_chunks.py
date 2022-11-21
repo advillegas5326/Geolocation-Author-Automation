@@ -197,6 +197,12 @@ def send_to_api_info(data):
     final = response.json()
     return final
 
+
+def send_telegram_error(text):
+    dbutils.notebook.run(path='/Repos/nick_altgelt@bat.com/Geolocation-Author-Automation/steps/utils/telegram_live_notifications', timeout_seconds=0, arguments={
+        'send_text': f"Sucedió un problema dentro de la ejecución con el siguiente error: {text}",
+    })
+
 # COMMAND ----------
 
 # MAGIC %md
@@ -205,7 +211,12 @@ def send_to_api_info(data):
 # COMMAND ----------
 
 
-countries_array = getting_data(database, table, splits)
+try:
+    countries_array = getting_data(database, table, splits)
+except Exception as e:
+    print(e)
+    send_telegram_error(e)
+
 
 # COMMAND ----------
 
@@ -226,79 +237,3 @@ else:
 # COMMAND ----------
 
 dbutils.notebook.exit("success")
-
-# COMMAND ----------
-
-# class FileSettings(object):
-
-#     def __init__(
-#         self,
-#         file_path,
-#         row_size,
-#         path_to_save,
-#         save_name,
-#         country,
-#         experiment_name,
-#         cities_table,
-#         input_language,
-#         table_results,
-#         model,
-#         ):
-#         self.file_path = file_path
-#         self.row_size = row_size
-#         self.path_to_save = path_to_save
-#         self.save_name = save_name
-#         self.country = country
-#         self.experiment_name = experiment_name
-#         self.cities_table = cities_table
-#         self.input_language = input_language
-#         self.table_results = table_results
-#         self.model = model
-
-
-# class FileSplitter(object):
-
-#     def __init__(self, file_settings):
-#         self.file_settings = file_settings
-
-#         if type(self.file_settings).__name__ != 'FileSettings':
-#             raise Exception('Please pass correct instance ')
-
-#         self.df = pd.read_csv(self.file_settings.file_path,
-#                               chunksize=self.file_settings.row_size)
-
-#     def run(self):
-#         # path
-#         directory = self.file_settings.path_to_save + '/' \
-#             + self.file_settings.save_name
-
-#         # creates a subfolder
-#         dbutils.fs.mkdirs(directory)
-#         save_file_paths = []
-#         counter = 0
-#         while True:
-#             try:
-#                 file_name = \
-#                     '/dbfs{}/{}_{}_row_{}.csv'.format(directory,
-#                         self.file_settings.save_name, counter,
-#                         self.file_settings.row_size)
-#                 self.df = self.df.drop["Unnamed: 0"]
-#                 df = next(self.df).to_csv(file_name)
-#                 save_file_paths.append({
-#                     'country':self.file_settings.country+"-"+str(counter),
-#                     'records':self.df.shape[0],
-#                     'fpath': file_name,
-#                     'experiment_name': self.file_settings.save_name
-#                         + '_chunk_' + str(counter),
-#                     'cities_table': self.file_settings.cities_table,
-#                     'input_language': self.file_settings.input_language,
-#                     'table_results': self.file_settings.table_results,
-#                     'model': self.file_settings.model,
-#                     })
-#                 counter = counter + 1
-#             except StopIteration:
-#                 break
-#             except Exception as e:
-#                 print ('Error:', e)
-#                 break
-#         return save_file_paths

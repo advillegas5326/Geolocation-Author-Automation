@@ -84,6 +84,12 @@ def send_to_api(data):
     final = response.json()
     return final
 
+
+def send_telegram_error(text):
+    dbutils.notebook.run(path='/Repos/nick_altgelt@bat.com/Geolocation-Author-Automation/steps/utils/telegram_live_notifications', timeout_seconds=0, arguments={
+        'send_text': f"Sucedió un problema dentro de la ejecución con el siguiente error: {text}",
+    })
+
 # COMMAND ----------
 
 # MAGIC %md ##Excecution
@@ -92,14 +98,18 @@ def send_to_api(data):
 
 
 # Geolocation Saving Chunks
-config = {
-    "experiment_name": experiment_name,
-    "fpath": fpath,
-    "cities_table": cities_table,
-    "input_language": input_language
-}
-pipeline_result = pipeline_driver(config)
-print(pipeline_result)
+
+try:
+    config = {
+        "experiment_name": experiment_name,
+        "fpath": fpath,
+        "cities_table": cities_table,
+        "input_language": input_language
+    }
+    pipeline_result = pipeline_driver(config)
+except Exception as e:
+    print(e)
+    send_telegram_error(e)
 
 # COMMAND ----------
 

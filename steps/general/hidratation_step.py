@@ -1,6 +1,5 @@
 # Databricks notebook source
 import pandas as pd
-import time
 import requests
 
 # COMMAND ----------
@@ -41,15 +40,21 @@ def send_to_api(data):
     final = response.json()
     return final
 
+
+def send_telegram_error(text):
+    dbutils.notebook.run(path='/Repos/nick_altgelt@bat.com/Geolocation-Author-Automation/steps/utils/telegram_live_notifications', timeout_seconds=0, arguments={
+        'send_text': f"Sucedió un problema dentro de la ejecución con el siguiente error: {text}",
+    })
+
 # COMMAND ----------
 
 
 # Hidratation
-hidratation_result = inference_hidratation(file_path)
-
-# COMMAND ----------
-
-print(hidratation_result)
+try:
+    hidratation_result = inference_hidratation(file_path)
+except Exception as e:
+    print(e)
+    send_telegram_error(e)
 
 # COMMAND ----------
 
