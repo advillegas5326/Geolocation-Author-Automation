@@ -18,37 +18,41 @@ print(input_file_path, output_file_path)
 
 # COMMAND ----------
 
-#Functions
+# Functions
+
+
 def data_preparation(file_path):
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.0/source/geolocation_data_prep/geolocation_data_prep'
-                         , timeout_seconds=0, arguments={
+    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.0/source/geolocation_data_prep/geolocation_data_prep', timeout_seconds=0, arguments={
         'input_file_path': input_file_path,
         'output_file_path': output_file_path,
         'user_column_name': 'SenderUserId',
         'channel_column_name': 'Message_Type',
         'post_link_column_name': 'Permalink',
         'post_text_column_name': 'cleaned_original_text',
-        })
-    
+    })
+
+
 def csv_to_dataframe(csv_path):
-  data = pd.read_csv(csv_path)
-  return data
+    data = pd.read_csv(csv_path)
+    return data
+
 
 def send_to_api(data):
-  url = "https://edp-middleware.herokuapp.com"
-  path = "/end_preparation"
-  response = requests.post(url = url+path, json = data)
-  final = response.json()
-  return final
+    url = "https://edp-middleware.herokuapp.com"
+    path = "/end_preparation"
+    response = requests.post(url=url + path, json=data)
+    final = response.json()
+    return final
 
 # COMMAND ----------
 
-#Preparation
+
+# Preparation
 prepairing_result = data_preparation(input_file_path)
 
 # COMMAND ----------
 
-response = send_to_api({"fpath":prepairing_result, "country":country})
+response = send_to_api({"fpath": prepairing_result, "country": country})
 print(response)
 
 # COMMAND ----------

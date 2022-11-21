@@ -7,7 +7,7 @@
 
 # COMMAND ----------
 
-#Imports
+# Imports
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import numpy as np
 import pandas as pd
@@ -16,7 +16,7 @@ import requests
 
 # COMMAND ----------
 
-dbutils.widgets.text("fpath",'')
+dbutils.widgets.text("fpath", '')
 fpath = dbutils.widgets.get("fpath")
 
 dbutils.widgets.text("country", '')
@@ -30,46 +30,51 @@ lang = dbutils.widgets.get("lang")
 
 # COMMAND ----------
 
-#Functions
-def pipeline_driver(fpath,lang):
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.0/source/inference/Pipeline_driver'
-                         , timeout_seconds=0, arguments={
-        'author_model_dir': "author_model_v0.8.3_en_v0.7.5"
-            ,
+# Functions
+
+
+def pipeline_driver(fpath, lang):
+    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.0/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
+        'author_model_dir': "author_model_v0.8.3_en_v0.7.5",
         'input_file_path': fpath,
         'output_file_path': fpath,
         'channel_column': "channel",
         'lang': lang,
         'tf_version': "2.5.0",
-        })
-    
+    })
+
+
 def read_csv_files(files):
-  data=[]
-  for file in files:
-    data_file = pd.read_csv(file)
-    data.append(data_file)
-  return data
+    data = []
+    for file in files:
+        data_file = pd.read_csv(file)
+        data.append(data_file)
+    return data
+
 
 def dataframe_to_csv(data):
-  path = path_to_save+save_name+".csv"
-  data.to_csv(path, index=False)
-  return path
+    path = path_to_save + save_name + ".csv"
+    data.to_csv(path, index=False)
+    return path
+
 
 def csv_to_dataframe(csv_path):
-  data = pd.read_csv(csv_path)
-  return data
+    data = pd.read_csv(csv_path)
+    return data
+
 
 def search_for_non_analyzed(table_path):
-  all_records = spark.sql("select * from {}".format(table_path)).toPandas()
-  non_analyzed_dataframe = all_records.loc[all_records['is_analyzed'] == False]
-  return non_analyzed_dataframe
-    
+    all_records = spark.sql("select * from {}".format(table_path)).toPandas()
+    non_analyzed_dataframe = all_records.loc[all_records['is_analyzed'] == False]
+    return non_analyzed_dataframe
+
+
 def send_to_api(data):
-  url = "https://edp-middleware.herokuapp.com"
-  path = "/end_geolocation"
-  response = requests.post(url = url+path, json = data)
-  final = response.json()
-  return final
+    url = "https://edp-middleware.herokuapp.com"
+    path = "/end_geolocation"
+    response = requests.post(url=url + path, json=data)
+    final = response.json()
+    return final
 
 # COMMAND ----------
 
@@ -77,8 +82,9 @@ def send_to_api(data):
 
 # COMMAND ----------
 
-#author Saving Chunks
-pipeline_result = pipeline_driver(fpath,lang)
+
+# author Saving Chunks
+pipeline_result = pipeline_driver(fpath, lang)
 print(pipeline_result)
 
 # COMMAND ----------
@@ -93,18 +99,19 @@ result_dataframe
 
 # COMMAND ----------
 
-#Get Result
+# Get Result
 for col in result_dataframe.columns:
     result_dataframe[col] = result_dataframe[col].astype(str)
 if 'Unnamed: 0' in result_dataframe:
-  result_dataframe = result_dataframe.drop('Unnamed: 0', axis=1)
+    result_dataframe = result_dataframe.drop('Unnamed: 0', axis=1)
 # result_dataframe_ultra = result_dataframe[["Brand","Category","Permalink","Language","country_based_model_predictions","SN_MSG_ID","Created_Time","combined_city_prediction","Country","combined_country_prediction"]]
 # print(result_dataframe.shape)
 
 # COMMAND ----------
 
 spark_df = spark.createDataFrame(result_dataframe)
-spark_df.write.format("delta").mode("append").saveAsTable(f"author_weekly.{table_results}")
+spark_df.write.format("delta").mode("append").saveAsTable(
+    f"author_weekly.{table_results}")
 
 # COMMAND ----------
 
@@ -116,4 +123,3 @@ spark_df.write.format("delta").mode("append").saveAsTable(f"author_weekly.{table
 dbutils.notebook.exit(pipeline_result)
 
 # COMMAND ----------
-
