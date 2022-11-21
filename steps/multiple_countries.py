@@ -226,8 +226,8 @@ def send_to_api_info(data):
 
 
 def send_telegram_error(text):
-    dbutils.notebook.run(path='/Repos/nick_altgelt@bat.com/Geolocation-Author-Automation/steps/utils/telegram_live_notificacions', timeout_seconds=0, arguments={
-        'sebnd_text': f"Sucedió un problema con el siguiente error: {text}",
+    dbutils.notebook.run(path='/Repos/nick_altgelt@bat.com/Geolocation-Author-Automation/steps/utils/telegram_live_notifications', timeout_seconds=0, arguments={
+        'send_text': f"Sucedió un problema dentro de la ejecución con el siguiente error: {text}",
     })
 
 # COMMAND ----------
