@@ -29,12 +29,6 @@ import requests
 
 # COMMAND ----------
 
-# dbutils.widgets.text("compute_universe", '')
-# compute_universe = dbutils.widgets.get("compute_universe")
-
-# dbutils.widgets.text("splits", "")
-# splits = dbutils.widgets.get("splits")
-
 dbutils.widgets.text("country_prediction", '')
 country_prediction = dbutils.widgets.get("country_prediction")
 
@@ -47,72 +41,12 @@ manual_month = dbutils.widgets.get("manual_month")
 dbutils.widgets.text("get_data", 'False')
 get_data = dbutils.widgets.get("get_data")
 
-dbutils.widgets.text("using_api", 'True')
-using_api = dbutils.widgets.get("using_api")
-
 dbutils.widgets.text("is_author", 'False')
 is_author = dbutils.widgets.get("is_author")
 
 # COMMAND ----------
 
 # MAGIC %md ##Functions
-
-# COMMAND ----------
-
-# Old Notebooks
-
-
-def paralllel_geolocation(config_object):
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Geolocation/Geolocation Automation/v1.2/geolocation_job', timeout_seconds=0, arguments={
-        'cities_table': f'/dbfs/mnt/geolocation/data/nodel/{config_object["cities_table"]}',
-        'experiment_name': config_object["experiment_name"],
-        'fpath': config_object["fpath"],
-        'input_language': config_object["input_language"],
-        'table_results': config_object["table_results"],
-    })
-
-
-def inference_hidratation(file_path):
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.0/source/data_hydratation_process', timeout_seconds=0, arguments={
-        'channel_column_name': 'Message_Type',
-        'creds_scope_name': 'geolocation',
-        'creds_set_name': 'DEV',
-        'input_file_path': file_path,
-        'user_column_name': 'SenderUserId',
-        'post_link_column_name': 'Permalink',
-    })
-
-
-def data_preparation(file_path):
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.0/source/geolocation_data_prep/geolocation_data_prep', timeout_seconds=0, arguments={
-        'input_dataset_path': file_path,
-        'post_owner_column_name': 'SenderScreenName',
-        'post_social_network_column_name': 'Message_Type',
-        'post_url_column_name': 'Permalink',
-        'post_text_column_name': 'cleaned_original_text',
-    })
-
-
-def hidratation_preparation_geolocation_simple(country):
-
-    print("\n---------------------Starting Hidratation--------------------\n")
-    hidratation_result = inference_hidratation(country[8])
-    print(hidratation_result)
-
-    print("\n------------------------Prepairing Data----------------------\n")
-    prepairing_result = data_preparation(country[8])
-    print(prepairing_result)
-
-    print("\n---------------------Starting Geolocation--------------------\n")
-    result_geolocated = paralllel_geolocation({
-        'fpath': country[8],
-        'experiment_name': country[7],
-        'cities_table': country[5],
-        'input_language': country[2],
-        'table_results': country[3],
-    })
-    print(result_geolocated)
-    print("\n---------------------------Complete--------------------------\n")
 
 # COMMAND ----------
 
@@ -130,19 +64,6 @@ def dataframe_to_csv(data, path_to_save, save_name):
 def csv_to_dataframe(csv_path):
     data = pd.read_csv(csv_path)
     return data
-
-
-def compute_universe():
-    complete_dataframe = spark.sql(
-        f"SELECT {final_table_path}.* FROM {final_table_path} LEFT JOIN {initial_db} ON ({final_table_path}.SN_MSG_ID = {initial_db}.SN_MSG_ID) WHERE {initial_db}.SN_MSG_ID = {final_table_path}.SN_MSG_ID").toPandas()
-    complete_dataframe = complete_dataframe.drop_duplicates(
-        subset='SN_MSG_ID', keep="first")
-    print("Complete Size without dupicates: ", complete_dataframe.shape)
-    file_path = "/dbfs" + path_to_save + "/" + \
-        save_name + "/" + save_name + "_universe" + ".csv"
-    complete_dataframe.to_csv(file_path, index=False)
-    print("Path: ", file_path)
-    dbutils.notebook.exit(file_path)
 
 
 def create_execution_variables():
@@ -301,6 +222,12 @@ def send_to_api_info(data):
     final = response.json()
     return final
 
+
+def send_telegram_error(text):
+    dbutils.notebook.run(path='/Repos/nick_altgelt@bat.com/Geolocation-Author-Automation/steps/utils/telegram_live_notificacions', timeout_seconds=0, arguments={
+        'sebnd_text': f"Sucedió un problema con el siguiente error: {text}",
+    })
+
 # COMMAND ----------
 
 # MAGIC %md
@@ -309,7 +236,12 @@ def send_to_api_info(data):
 # COMMAND ----------
 
 
-countries_array = getting_data()
+try:
+    countries_array = getting_data()
+except NameError:
+    print(NameError)
+    send_telegram_error(NameError)
+
 
 # COMMAND ----------
 
@@ -332,46 +264,37 @@ if(get_data == "True"):
         print(data)
         send_to_api_info(data)
 else:
-    if(using_api == "True"):
-        if(is_author == "False"):
-            # print(countries_array)
-            for country in countries_array:
-                data.append({
-                    'country': country[1],
-                    'records': country[10],
-                    'fpath': country[8],
-                    'experiment_name': country[7],
-                    'cities_table': country[5],
-                    'input_language': country[2],
-                    'table_results': country[3],
-                    'model': "geolocation",
-                })
-            print(data)
-            send_to_api(data)
-        else:
-            # print(countries_array)
-            for country in countries_array:
-                data.append({
-                    'country': country[1],
-                    'records': country[10],
-                    'fpath': country[8],
-                    'experiment_name': country[7],
-                    'cities_table': country[5],
-                    'input_language': country[2],
-                    'table_results': country[3],
-                    'model': "author",
-                })
-            print(data)
-            send_to_api(data)
-    else:
-        print("\n------------Hidratation/Preparation/Geolocation--------------\n")
+    if(is_author == "False"):
+        # print(countries_array)
         for country in countries_array:
-            start_execution = time.time()
-            print(
-                f"\nActual Country: {country[1]} - With {country[10]} Records")
-            hidratation_preparation_geolocation_simple(country)
-            print(f"Execution Time: {(time.time() - start_execution)/60}")
+            data.append({
+                'country': country[1],
+                'records': country[10],
+                'fpath': country[8],
+                'experiment_name': country[7],
+                'cities_table': country[5],
+                'input_language': country[2],
+                'table_results': country[3],
+                'model': "geolocation",
+            })
+        print(data)
+        send_to_api(data)
+    else:
+        # print(countries_array)
+        for country in countries_array:
+            data.append({
+                'country': country[1],
+                'records': country[10],
+                'fpath': country[8],
+                'experiment_name': country[7],
+                'cities_table': country[5],
+                'input_language': country[2],
+                'table_results': country[3],
+                'model': "author",
+            })
+        print(data)
+        send_to_api(data)
 
 # COMMAND ----------
 
-dbutils.notebook.exit("success")
+dbutils.notebook.exit(data)
