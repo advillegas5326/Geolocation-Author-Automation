@@ -65,7 +65,7 @@ def csv_to_dataframe(csv_path):
 
 def search_for_non_analyzed(table_path):
     all_records = spark.sql("select * from {}".format(table_path)).toPandas()
-    non_analyzed_dataframe = all_records.loc[all_records['is_analyzed'] == False]
+    non_analyzed_dataframe = all_records.loc[all_records['is_analyzed'] is False]
     return non_analyzed_dataframe
 
 

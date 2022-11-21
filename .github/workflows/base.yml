@@ -64,5 +64,5 @@ jobs:
         run: python -m pip install black flake8 isort
       - name: Linting check
         run: |
-          flake8 . --ignore=W191,E24,W504,E501,E262,E722,E251,W291,W293,E261,E305,E203,E226,E303,E225,E265,E222,F401,E302,E231,E111,E302,E265,E301,W292,F405,F403,F821
+          flake8 . --ignore=W191,E24,W504,E501,E262,E722,E251,W291,W293,E261,E305,E203,E226,E303,E225,E265,E222,F401,E302,E231,E111,E302,E265,E301,W292,F405,F403,F821,E275
           isort .

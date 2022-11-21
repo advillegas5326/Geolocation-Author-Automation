@@ -95,7 +95,6 @@ def data_preparation(file_path):
 
 def hidratation_preparation_geolocation_simple(country):
 
-    shape = country[9].shape[0]
     print("\n---------------------Starting Hidratation--------------------\n")
     hidratation_result = inference_hidratation(country[8])
     print(hidratation_result)
@@ -114,13 +113,6 @@ def hidratation_preparation_geolocation_simple(country):
     })
     print(result_geolocated)
     print("\n---------------------------Complete--------------------------\n")
-
-# COMMAND ----------
-
-# data = spark.sql("SELECT * From default.japan_october_2022112_w_author_preds").toPandas()
-# print(data['Sentiment_New'].value_counts())
-# print(data['Funnel_New'].value_counts())
-# csv = data.to_csv("/dbfs/FileStore/shared_uploads/nick_altgelt@bat.com/japan_october_2022112_full.csv",index=False)
 
 # COMMAND ----------
 

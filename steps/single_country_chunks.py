@@ -159,8 +159,7 @@ def csv_splitter(size, country, frame, splits):
             'country': country[1] + "-" + str(counter),
             'records': i.shape[0],
             'fpath': file_name,
-            'experiment_name': country[7]
-            + '_chunk_' + str(counter),
+            'experiment_name': country[7] + '_chunk_' + str(counter),
             'cities_table': country[5],
             'input_language': country[2],
             'table_results': country[3],
@@ -207,12 +206,6 @@ def send_to_api_info(data):
 
 
 countries_array = getting_data(database, table, splits)
-
-# COMMAND ----------
-
-# data = pd.read_csv("/dbfs/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks/chile_total_2022118/chile_total_2022118_10444_row_7.csv", lineterminator="\n")
-# print(data["Age"].value_counts())# data = pd.read_csv("/dbfs/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks/chile_total_2022118/chile_total_2022118_10444_row_7.csv", lineterminator="\n")
-# print(data["Age"].value_counts())
 
 # COMMAND ----------
 
