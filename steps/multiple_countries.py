@@ -197,17 +197,12 @@ def create_execution_variables():
 
             complete_countries.append([(initial_db, country, input_language, f"author_{month}_{country}",
                                       f"author_weekly.author_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks", save_name),
-                                       (initial_db, country, input_language, f"geolocation_{month}_{country}",
+                                       (initial_db, country, input_language, f"geolocated_{month}_{country}",
                                        f"geolocation_weekly.geolocation_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks", save_name)])
         return complete_countries
 
 
 def complement_or_complete_data(temp_table, table_results, initial_db, final_table_path, path_to_save, save_name):
-
-    # if(is_author == "False"):
-    #     temp_table = "geolocation_weekly"
-    # else:
-    #     temp_table = "author_weekly"
 
     if not DeltaTable.isDeltaTable(spark, f'/user/hive/warehouse/{temp_table}.db/{table_results}'):
         non_analyzed_dataframe = spark.sql(
@@ -276,11 +271,10 @@ def getting_data():
 
     else:
 
-        temp_table = "author_weekly"
         for x, country in enumerate(countries_array):
-            print("------------------------------------------------")
-            print(f"\n-----COUNTRY: {country[0][1]}\n")
-            print("-------AUTHOR\n")
+            print("\n------------------------------------------------")
+            print(f"\nCOUNTRY: {country[0][1]}\n")
+            print("AUTHOR\n")
 
             file_path, non_analyzed_dataframe = complement_or_complete_data("author_weekly",
                                                                             country[0][3], country[0][0], country[0][4], country[0][6], country[0][7])
@@ -290,7 +284,7 @@ def getting_data():
             countries_array[x][0] = countries_array[x][0] + \
                 (non_analyzed_dataframe.shape[0],)
 
-            print("\n-------GEOLOCATION\n")
+            print("\nGEOLOCATION\n")
 
             file_path, non_analyzed_dataframe = complement_or_complete_data("geolocation_weekly",
                                                                             country[1][3], country[1][0], country[1][4], country[1][6], country[1][7])
@@ -354,11 +348,20 @@ if(get_data == "True"):
             })
         print(data)
         send_to_api_info(data)
-    else:
+    elif(is_author == "True"):
         for country in countries_array:
             data.append({
                 'country': country[1],
                 'records': f"Records sin aplicar author: {country[9].shape[0]} - Columnas de la data : {country[9].shape[1]}",
+            })
+        print(data)
+        send_to_api_info(data)
+    else:
+        for country in countries_array:
+            model = country[3].split('_')
+            data.append({
+                'country': country[1],
+                'records': f"Records sin aplicar {model[0]}: {country[9].shape[0]} - Columnas de la data : {country[9].shape[1]}",
             })
         print(data)
         send_to_api_info(data)
