@@ -198,7 +198,7 @@ def create_execution_variables():
             complete_countries.append([(initial_db, country, input_language, f"author_{month}_{country}",
                                       f"author_weekly.author_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks", save_name),
                                        (initial_db, country, input_language, f"geolocated_{month}_{country}",
-                                       f"geolocation_weekly.geolocation_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks", save_name)])
+                                       f"geolocation_weekly.geolocated_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks", save_name)])
         return complete_countries
 
 
@@ -358,10 +358,15 @@ if(get_data == "True"):
         send_to_api_info(data)
     else:
         for country in countries_array:
-            model = country[3].split('_')
+            model = country[0][3].split('_')
             data.append({
-                'country': country[1],
-                'records': f"Records sin aplicar {model[0]}: {country[9].shape[0]} - Columnas de la data : {country[9].shape[1]}",
+                'country': country[0][1],
+                'records': f"Records sin aplicar {model[0]}: {country[0][9].shape[0]} - Columnas de la data : {country[0][9].shape[1]}",
+            })
+            model = country[1][3].split('_')
+            data.append({
+                'country': country[1][1],
+                'records': f"Records sin aplicar {model[0]}: {country[1][9].shape[0]} - Columnas de la data : {country[1][9].shape[1]}",
             })
         print(data)
         send_to_api_info(data)
