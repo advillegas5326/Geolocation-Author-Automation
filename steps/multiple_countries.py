@@ -196,9 +196,9 @@ def create_execution_variables():
             #final_table_path = f"{database}.{table_results}"
 
             complete_countries.append([(initial_db, country, input_language, f"author_{month}_{country}",
-                                      f"author_weekly.{table_results}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks", save_name),
+                                      f"author_weekly.author_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks", save_name),
                                        (initial_db, country, input_language, f"geolocation_{month}_{country}",
-                                       f"geolocation_weekly.{table_results}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks", save_name)])
+                                       f"geolocation_weekly.geolocation_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/geolocation_chunks", save_name)])
         return complete_countries
 
 
@@ -278,7 +278,9 @@ def getting_data():
 
         temp_table = "author_weekly"
         for x, country in enumerate(countries_array):
-            print(f"\ncountry: {country[1]}\n")
+            print(f"\ncountry: {country[0][0]}\n")
+            print("AUTHOR\n")
+
             file_path, non_analyzed_dataframe = complement_or_complete_data("author_weekly",
                                                                             country[0][3], country[0][0], country[0][4], country[0][6], country[0][7])
             countries_array[x][0] = countries_array[x][0] + (file_path,)
@@ -286,6 +288,8 @@ def getting_data():
                 (non_analyzed_dataframe,)
             countries_array[x][0] = countries_array[x][0] + \
                 (non_analyzed_dataframe.shape[0],)
+
+            print("GEOLOCATION\n")
 
             file_path, non_analyzed_dataframe = complement_or_complete_data("geolocation_weekly",
                                                                             country[1][3], country[1][0], country[1][4], country[1][6], country[1][7])
