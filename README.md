@@ -15,7 +15,7 @@
   <a href="#download">Download</a>
 </p>
 
-![screenshot](https://raw.githubusercontent.com/advillegas5326/Geolocation-Author-Automation/main/images/header.png)
+![screenshot](https://raw.githubusercontent.com/advillegas5326/Geolocation-Author-Automation/main/assets/images/header.png)
 
 ## Key Features
 

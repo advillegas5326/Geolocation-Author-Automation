@@ -20,7 +20,7 @@ on:
       - "feature_*"
       - "feature*"
 jobs:
-  test:
+  general-tests:
     runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
