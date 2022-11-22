@@ -8,8 +8,6 @@
 # COMMAND ----------
 
 # Imports
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-import numpy as np
 import pandas as pd
 from delta.tables import *
 import requests
@@ -19,8 +17,8 @@ import requests
 dbutils.widgets.text("experiment_name", '')
 experiment_name = dbutils.widgets.get("experiment_name")
 
-dbutils.widgets.text("fpath", '')
-fpath = dbutils.widgets.get("fpath")
+dbutils.widgets.text("geolocation_fpath", '')
+geolocation_fpath = dbutils.widgets.get("geolocation_fpath")
 
 dbutils.widgets.text("cities_table", '')
 cities_table = dbutils.widgets.get("cities_table")
@@ -45,36 +43,16 @@ def pipeline_driver(config_object):
         'creds_scope_name': 'geolocation',
         'creds_set_name': 'DEV',
         'experiment_name': config_object["experiment_name"],
-        'fpath': config_object["fpath"],
+        'fpath': config_object["geolocation_fpath"],
         'input_language': config_object["input_language"],
         'stochastic_models_debug_mode': 'False',
         'test_sample_only': 'False',
     })
 
 
-def read_csv_files(files):
-    data = []
-    for file in files:
-        data_file = pd.read_csv(file)
-        data.append(data_file)
-    return data
-
-
-def dataframe_to_csv(data):
-    path = path_to_save + save_name + ".csv"
-    data.to_csv(path, index=False)
-    return path
-
-
 def csv_to_dataframe(csv_path):
     data = pd.read_csv(csv_path)
     return data
-
-
-def search_for_non_analyzed(table_path):
-    all_records = spark.sql("select * from {}".format(table_path)).toPandas()
-    non_analyzed_dataframe = all_records.loc[all_records['is_analyzed'] is False]
-    return non_analyzed_dataframe
 
 
 def send_to_api(data):
@@ -96,13 +74,13 @@ def send_telegram_error(text):
 
 # COMMAND ----------
 
-
 # Geolocation Saving Chunks
+
 
 try:
     config = {
         "experiment_name": experiment_name,
-        "fpath": fpath,
+        "fpath": geolocation_fpath,
         "cities_table": cities_table,
         "input_language": input_language
     }
@@ -146,7 +124,8 @@ spark_df.write.format("delta").mode("append").saveAsTable(
 
 # COMMAND ----------
 
-response = send_to_api({"fpath": pipeline_result, "country": country})
+response = send_to_api(
+    {"geolocation_fpath": pipeline_result, "country": country})
 print(response)
 
 # COMMAND ----------

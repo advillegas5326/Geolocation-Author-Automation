@@ -58,7 +58,8 @@ except Exception as e:
 
 # COMMAND ----------
 
-response = send_to_api({"fpath": hidratation_result, "country": country})
+response = send_to_api(
+    {"general_fpath": hidratation_result, "country": country})
 print(response)
 
 # COMMAND ----------

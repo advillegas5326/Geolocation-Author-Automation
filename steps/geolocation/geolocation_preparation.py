@@ -4,26 +4,23 @@ import requests
 
 # COMMAND ----------
 
-dbutils.widgets.text("input_file_path", '')
-input_file_path = dbutils.widgets.get("input_file_path")
-
-#output_file_path = input_file_path.split('.csv')[0] + "_prepared" + '.csv'
-output_file_path = input_file_path
+dbutils.widgets.text("geolocation_fpath", '')
+geolocation_fpath = dbutils.widgets.get("geolocation_fpath")
 
 dbutils.widgets.text("country", '')
 country = dbutils.widgets.get("country")
 
-print(input_file_path, output_file_path)
+print(geolocation_fpath)
 
 # COMMAND ----------
 
 # Functions
 
 
-def data_preparation(file_path):
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.0/source/geolocation_data_prep/geolocation_data_prep', timeout_seconds=0, arguments={
-        'input_file_path': input_file_path,
-        'output_file_path': output_file_path,
+def data_preparation():
+    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/geolocation_data_prep/geolocation_data_prep', timeout_seconds=0, arguments={
+        'input_file_path': geolocation_fpath,
+        'output_file_path': geolocation_fpath,
         'user_column_name': 'SenderUserId',
         'channel_column_name': 'Message_Type',
         'post_link_column_name': 'Permalink',
@@ -54,14 +51,15 @@ def send_telegram_error(text):
 
 # Preparation
 try:
-    prepairing_result = data_preparation(input_file_path)
+    prepairing_result = data_preparation()
 except Exception as e:
     print(e)
     send_telegram_error(e)
 
 # COMMAND ----------
 
-response = send_to_api({"fpath": prepairing_result, "country": country})
+response = send_to_api(
+    {"geolocation_fpath": prepairing_result, "country": country})
 print(response)
 
 # COMMAND ----------

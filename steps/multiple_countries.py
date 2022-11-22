@@ -303,6 +303,7 @@ def getting_data():
 
             file_path, non_analyzed_dataframe = complement_or_complete_data("author_weekly",
                                                                             country[0][3], country[0][0], country[0][4], country[0][6], country[0][7])
+
             countries_array[x][0] = countries_array[x][0] + (file_path,)
             countries_array[x][0] = countries_array[x][0] + \
                 (non_analyzed_dataframe,)
@@ -399,7 +400,7 @@ else:
     if(is_author == "False"):
 
         model = country[3].split('_')
-        if model is "geolocated":
+        if model == "geolocated":
             model = "geolocation"
 
         for country in countries_array:
@@ -420,7 +421,7 @@ else:
         for country in countries_array:
 
             model = country[3].split('_')
-            if model is "geolocated":
+            if model == "geolocated":
                 model = "geolocation"
 
             data.append({
@@ -439,12 +440,13 @@ else:
         for country in countries_array:
 
             model = country[0][3].split('_')
-            if model is "geolocated":
+            if model == "geolocated":
                 model = "geolocation"
 
             data.append({
                 'country': country[0][1],
-                'records': country[0][10],
+                'geolocation_records': country[1][10],
+                'author_records': country[0][10],
                 'geolocation_fpath': country[1][8],
                 'author_fpath': country[0][8],
                 'experiment_name': country[1][7],
@@ -452,7 +454,6 @@ else:
                 'input_language': country[0][2],
                 'geolocation_table_results': country[1][3],
                 'author_table_results': country[0][3],
-                'model': model,
             })
         # send_to_api(data)
 
@@ -460,4 +461,7 @@ else:
 
 final_frame = pd.DataFrame(data)
 display(data)
+
+# COMMAND ----------
+
 dbutils.notebook.exit("Done")
