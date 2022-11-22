@@ -14,13 +14,9 @@
 # COMMAND ----------
 
 # Imports
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-import multiprocessing
-import numpy as np
 import pandas as pd
 import datetime
 from delta.tables import *
-import time
 import requests
 
 # COMMAND ----------
@@ -192,8 +188,8 @@ def create_execution_variables():
             else:
                 raise Exception(f"Language {input_language} is not supported")
 
-            #table_results = f"author_{month}_{country}"
-            #final_table_path = f"{database}.{table_results}"
+            # table_results = f"author_{month}_{country}"
+            # final_table_path = f"{database}.{table_results}"
 
             complete_countries.append([(initial_db, country, input_language, f"author_{month}_{country}",
                                       f"author_weekly.author_{month}_{country}", cities_table, "/FileStore/shared_uploads/nick_altgelt@bat.com/author_chunks", save_name),
@@ -205,23 +201,52 @@ def create_execution_variables():
 def complement_or_complete_data(temp_table, table_results, initial_db, final_table_path, path_to_save, save_name):
 
     if not DeltaTable.isDeltaTable(spark, f'/user/hive/warehouse/{temp_table}.db/{table_results}'):
+
+        # Select all dataframe
         non_analyzed_dataframe = spark.sql(
             "select * from {}".format(initial_db)).toPandas()
         print("Old size: ", non_analyzed_dataframe.shape)
+
+        # Drop duplicates
         non_analyzed_dataframe = non_analyzed_dataframe.drop_duplicates(
             subset='SN_MSG_ID', keep="first")
         print("New size: ", non_analyzed_dataframe.shape)
+
+        # Check column names of data - channel and user
+        if 'Channel' in non_analyzed_dataframe.columns:
+            non_analyzed_dataframe.columns.rename(
+                columns={'Channel': 'Message_Type'}, inplace=True)
+
+        if 'user_id' in non_analyzed_dataframe.columns:
+            non_analyzed_dataframe.columns.rename(
+                columns={'user_id': 'SenderUserId'}, inplace=True)
+
+        # Save new dataframe
         file_path = dataframe_to_csv(
             non_analyzed_dataframe, path_to_save, save_name)
         print("Path: ", file_path)
     else:
-        # MATCH TABLE WITH SAVED TABLE (HIDRATED AND GEOLOCATED)
+
+        # Select all dataframe
         non_analyzed_dataframe = spark.sql(
             f"SELECT {initial_db}.* FROM {initial_db} LEFT JOIN {final_table_path} ON ({initial_db}.SN_MSG_ID = {final_table_path}.SN_MSG_ID) WHERE {final_table_path}.SN_MSG_ID IS NULL").toPandas()
         print("Old size: ", non_analyzed_dataframe.shape)
+
+        # Drop duplicates
         non_analyzed_dataframe = non_analyzed_dataframe.drop_duplicates(
             subset='SN_MSG_ID', keep="first")
         print("New non analized size: ", non_analyzed_dataframe.shape)
+
+        # Check column names of data - channel and user
+        if 'Channel' in non_analyzed_dataframe.columns:
+            non_analyzed_dataframe.columns.rename(
+                columns={'Channel': 'Message_Type'}, inplace=True)
+
+        if 'user_id' in non_analyzed_dataframe.columns:
+            non_analyzed_dataframe.columns.rename(
+                columns={'user_id': 'SenderUserId'}, inplace=True)
+
+        # Save new dataframe to csv
         file_path = dataframe_to_csv(
             non_analyzed_dataframe, path_to_save, save_name)
         print("Path: ", file_path)
@@ -372,36 +397,67 @@ if(get_data == "True"):
         send_to_api_info(data)
 else:
     if(is_author == "False"):
-        # print(countries_array)
+
+        model = country[3].split('_')
+        if model is "geolocated":
+            model = "geolocation"
+
         for country in countries_array:
             data.append({
                 'country': country[1],
                 'records': country[10],
-                'fpath': country[8],
+                'geolocation_fpath': country[8],
                 'experiment_name': country[7],
                 'cities_table': country[5],
                 'input_language': country[2],
-                'table_results': country[3],
-                'model': "geolocation",
+                'geolocation_table_results': country[3],
+                'model': model,
             })
-        print(data)
-        send_to_api(data)
+        # send_to_api(data)
+
+    elif(is_author == "True"):
+
+        for country in countries_array:
+
+            model = country[3].split('_')
+            if model is "geolocated":
+                model = "geolocation"
+
+            data.append({
+                'country': country[1],
+                'records': country[10],
+                'author_fpath': country[8],
+                'experiment_name': country[7],
+                'cities_table': country[5],
+                'input_language': country[2],
+                'author_table_results': country[3],
+                'model': model,
+            })
+        # send_to_api(data)
     else:
-        # print(countries_array)
+
         for country in countries_array:
+
+            model = country[0][3].split('_')
+            if model is "geolocated":
+                model = "geolocation"
+
             data.append({
-                'country': country[1],
-                'records': country[10],
-                'fpath': country[8],
-                'experiment_name': country[7],
-                'cities_table': country[5],
-                'input_language': country[2],
-                'table_results': country[3],
-                'model': "author",
+                'country': country[0][1],
+                'records': country[0][10],
+                'geolocation_fpath': country[1][8],
+                'author_fpath': country[0][8],
+                'experiment_name': country[1][7],
+                'cities_table': country[1][5],
+                'input_language': country[0][2],
+                'geolocation_table_results': country[1][3],
+                'author_table_results': country[0][3],
+                'model': model,
             })
-        print(data)
-        send_to_api(data)
+        # send_to_api(data)
 
 # COMMAND ----------
 
-dbutils.notebook.exit(data)
+final_frame = pd.DataFrame(data)
+display(data)
+dbutils.notebook.exit("Done")
