@@ -14,13 +14,9 @@
 # COMMAND ----------
 
 # Imports
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-import multiprocessing
-import numpy as np
 import pandas as pd
 import datetime
 from delta.tables import *
-import time
 import requests
 
 # COMMAND ----------

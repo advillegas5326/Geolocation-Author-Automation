@@ -31,13 +31,13 @@ country_prediction = dbutils.widgets.get("country_prediction")
 dbutils.widgets.text("month", '')
 month = dbutils.widgets.get("month")
 
-dbutils.widgets.text("manual_month", '')
+dbutils.widgets.text("manual_month", 'False')
 manual_month = dbutils.widgets.get("manual_month")
 
 dbutils.widgets.text("get_data", 'False')
 get_data = dbutils.widgets.get("get_data")
 
-dbutils.widgets.text("is_author", 'False')
+dbutils.widgets.text("is_author", '')
 is_author = dbutils.widgets.get("is_author")
 
 # COMMAND ----------
@@ -399,11 +399,12 @@ if(get_data == "True"):
 else:
     if(is_author == "False"):
 
-        model = country[3].split('_')
-        if model == "geolocated":
-            model = "geolocation"
-
         for country in countries_array:
+
+            model = country[3].split('_')
+            if model == "geolocated":
+                model = "geolocation"
+
             data.append({
                 'country': country[1],
                 'records': country[10],
