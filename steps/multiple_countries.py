@@ -402,8 +402,8 @@ else:
         for country in countries_array:
 
             model = country[3].split('_')
-            if model == "geolocated":
-                model = "geolocation"
+            if model[0] == "geolocated":
+                model[0] = "geolocation"
 
             data.append({
                 'country': country[1],
@@ -413,7 +413,7 @@ else:
                 'cities_table': country[5],
                 'input_language': country[2],
                 'geolocation_table_results': country[3],
-                'model': model,
+                'model': model[0],
             })
         # send_to_api(data)
 
@@ -422,8 +422,8 @@ else:
         for country in countries_array:
 
             model = country[3].split('_')
-            if model == "geolocated":
-                model = "geolocation"
+            if model[0] == "geolocated":
+                model[0] = "geolocation"
 
             data.append({
                 'country': country[1],
@@ -433,7 +433,7 @@ else:
                 'cities_table': country[5],
                 'input_language': country[2],
                 'author_table_results': country[3],
-                'model': model,
+                'model': model[0],
             })
         # send_to_api(data)
     else:
