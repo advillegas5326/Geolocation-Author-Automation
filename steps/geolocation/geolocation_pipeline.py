@@ -57,7 +57,7 @@ def csv_to_dataframe(csv_path):
 
 def send_to_api(data):
     url = "https://edp-middleware.herokuapp.com"
-    path = "/end_geolocation"
+    path = "/end_geolocation_pipeline"
     response = requests.post(url=url + path, json=data)
     final = response.json()
     return final

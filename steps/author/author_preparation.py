@@ -35,7 +35,7 @@ def csv_to_dataframe(csv_path):
 
 def send_to_api(data):
     url = "https://edp-middleware.herokuapp.com"
-    path = "/end_preparation"
+    path = "/end_author_preparation"
     response = requests.post(url=url + path, json=data)
     final = response.json()
     return final

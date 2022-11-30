@@ -49,7 +49,7 @@ def csv_to_dataframe(csv_path):
 
 def send_to_api(data):
     url = "https://edp-middleware.herokuapp.com"
-    path = "/end_geolocation"
+    path = "/end_author_pipeline"
     response = requests.post(url=url + path, json=data)
     final = response.json()
     return final
@@ -83,7 +83,7 @@ except Exception as e:
 
 #result_dataframe = csv_to_dataframe("/dbfs/FileStore/shared_uploads/nick_altgelt@bat.com/japan_october_2022112_full.csv")
 result_dataframe = csv_to_dataframe(pipeline_result)
-result_dataframe
+display(result_dataframe.head(3))
 
 # COMMAND ----------
 
@@ -93,10 +93,26 @@ for col in result_dataframe.columns:
 if 'Unnamed: 0' in result_dataframe:
     result_dataframe = result_dataframe.drop('Unnamed: 0', axis=1)
 
+result_dataframe_ultra = result_dataframe[["SN_MSG_ID", "channel", "Created_Time", "Month", "Year", "username", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel",
+                                           "Sentiment", "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"]]
+print(result_dataframe_ultra.shape)
+
 # COMMAND ----------
 
-spark_df = spark.createDataFrame(result_dataframe)
-spark_df.write.format("delta").mode("append").saveAsTable(
+old_df = spark.sql(f"SELECT * from author_weekly.{table_results}").toPandas()
+old_df = old_df[["SN_MSG_ID", "channel", "Created_Time", "Month", "Year", "username", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel", "Sentiment",
+                 "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"]]
+print(old_df.shape)
+
+# COMMAND ----------
+
+new_data = pd.concat([result_dataframe_ultra, old_df])
+print(new_data.shape)
+
+# COMMAND ----------
+
+spark_df = spark.createDataFrame(new_data)
+spark_df.write.format("delta").mode("overwrite").saveAsTable(
     f"author_weekly.{table_results}")
 
 # COMMAND ----------
