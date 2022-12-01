@@ -43,7 +43,7 @@ def send_to_api(data):
 
 def send_telegram_error(text):
     dbutils.notebook.run(path='/Repos/nick_altgelt@bat.com/Geolocation-Author-Automation/steps/utils/telegram_live_notifications', timeout_seconds=0, arguments={
-        'send_text': f"Sucedió un problema dentro de la ejecución con el siguiente error: {text}",
+        'send_text': f"{text}",
     })
 
 # COMMAND ----------
@@ -54,12 +54,14 @@ try:
     prepairing_result = data_preparation()
 except Exception as e:
     print(e)
-    send_telegram_error(e)
+    send_telegram_error(
+        f"Sucedió un problema dentro de la ejecución de geolocation preparation con el siguiente error: {e}")
 
 # COMMAND ----------
 
 response = send_to_api(
     {"geolocation_fpath": prepairing_result, "country": country})
+send_telegram_error(f"Geolocation preparation terminado: {country}")
 print(response)
 
 # COMMAND ----------
