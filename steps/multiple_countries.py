@@ -415,7 +415,7 @@ else:
                 'geolocation_table_results': country[3],
                 'model': model[0],
             })
-        # send_to_api(data)
+        send_to_api(data)
 
     elif(is_author == "True"):
 
@@ -435,7 +435,7 @@ else:
                 'author_table_results': country[3],
                 'model': model[0],
             })
-        # send_to_api(data)
+        send_to_api(data)
     else:
 
         for country in countries_array:
@@ -456,7 +456,7 @@ else:
                 'geolocation_table_results': country[1][3],
                 'author_table_results': country[0][3],
             })
-        # send_to_api(data)
+        send_to_api(data)
 
 # COMMAND ----------
 
