@@ -80,7 +80,7 @@ def send_telegram_error(text):
 try:
     config = {
         "experiment_name": experiment_name,
-        "fpath": geolocation_fpath,
+        "geolocation_fpath": geolocation_fpath,
         "cities_table": cities_table,
         "input_language": input_language
     }

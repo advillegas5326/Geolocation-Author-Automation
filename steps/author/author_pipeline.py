@@ -83,7 +83,6 @@ except Exception as e:
 
 #result_dataframe = csv_to_dataframe("/dbfs/FileStore/shared_uploads/nick_altgelt@bat.com/japan_october_2022112_full.csv")
 result_dataframe = csv_to_dataframe(pipeline_result)
-display(result_dataframe.head(3))
 
 # COMMAND ----------
 
@@ -96,6 +95,7 @@ if 'Unnamed: 0' in result_dataframe:
 result_dataframe_ultra = result_dataframe[["SN_MSG_ID", "channel", "Created_Time", "Month", "Year", "username", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel",
                                            "Sentiment", "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"]]
 print(result_dataframe_ultra.shape)
+display(result_dataframe_ultra.head(3))
 
 # COMMAND ----------
 
