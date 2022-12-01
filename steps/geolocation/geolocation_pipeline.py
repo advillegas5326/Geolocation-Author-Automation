@@ -113,7 +113,7 @@ elif(input_language == "es"):
 if "country_based_model_predictions" not in result_dataframe:
     result_dataframe["country_based_model_predictions"] = "nan"
 
-result_dataframe_ultra = result_dataframe[["Brand", "Category", "Permalink", "Language", "country_based_model_predictions",
+result_dataframe_ultra = result_dataframe[["Brand", "bio", "Permalink", "Language", "country_based_model_predictions",
                                            "SN_MSG_ID", "Created_Time", "combined_city_prediction", "Country", "combined_country_prediction"]]
 print(result_dataframe.shape)
 

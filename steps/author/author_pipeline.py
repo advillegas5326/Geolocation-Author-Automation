@@ -32,13 +32,17 @@ lang = dbutils.widgets.get("lang")
 
 
 def pipeline_driver(author_fpath, lang):
+
+    author_models = {"jp": 'author_model_v0.8.2_ja', "de": 'author_model_v0.8.3_de_v0.4.0', "en": 'author_model_v0.8.3_en_v0.7.5', "it": 'author_model_v0.8.3_it_v1.6',
+                     "ru": 'author_model_v0.8.3_ru_v0.8.2', "fr": 'french_v0.4.0_v1.2', "es": 'spanish_v0.4.0_v1.4', "sw": 'swedish_v0_4_0_v2', "kr": 'korean_v0.4.0_v8'}
+
     return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.0/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
-        'author_model_dir': "author_model_v0.8.3_en_v0.7.5",
+        'author_model_dir': author_models[lang],
         'input_file_path': author_fpath,
         'output_file_path': author_fpath,
         'channel_column': "channel",
         'lang': lang,
-        'tf_version': "2.5.0",
+        'tf_version': "2.6.0",
     })
 
 
