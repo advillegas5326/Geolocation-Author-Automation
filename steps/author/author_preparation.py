@@ -1,6 +1,7 @@
 # Databricks notebook source
 import pandas as pd
 import requests
+from datetime import date
 
 # COMMAND ----------
 
@@ -18,14 +19,32 @@ print(author_fpath)
 
 
 def data_preparation():
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
-        'input_file_path': author_fpath,
-        'output_file_path': author_fpath,
-        'user_column_name': 'SenderUserId',
-        'channel_column_name': 'Message_Type',
-        'post_link_column_name': 'Permalink',
-        'post_text_column_name': 'cleaned_original_text',
-    })
+
+    today = date.today()
+    d4 = today.strftime("%b_%d_%Y")
+
+    if(country != "japan"):
+
+        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
+            'input_file_path': author_fpath,
+            'output_file_path': author_fpath,
+            'user_column_name': 'SenderUserId',
+            'channel_column_name': 'Message_Type',
+            'post_link_column_name': 'Permalink',
+            'post_text_column_name': 'cleaned_original_text',
+        })
+
+    else:
+
+        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
+            'database': "pei",
+            'table': "japan_full_data_table_november",
+            'output_table': f"japan_temporal_results_{d4}",
+            'user_column_name': 'SenderUserId',
+            'channel_column_name': 'Message_Type',
+            'post_link_column_name': 'Permalink',
+            'post_text_column_name': 'cleaned_original_text',
+        })
 
 
 def csv_to_dataframe(csv_path):
