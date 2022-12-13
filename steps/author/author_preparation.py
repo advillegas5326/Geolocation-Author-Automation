@@ -25,7 +25,7 @@ def data_preparation():
 
     if(country != "japan"):
 
-        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
+        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.2/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
             'input_file_path': author_fpath,
             'output_file_path': author_fpath,
             'user_column_name': 'SenderUserId',
@@ -78,7 +78,8 @@ except Exception as e:
 
 # COMMAND ----------
 
-response = send_to_api({"author_fpath": prepairing_result, "country": country})
+response = send_to_api({"author_fpath": prepairing_result["output_file_path"],
+                       "column_names_dict_path": prepairing_result["dict_path"], "country": country})
 send_telegram_error(f"Author preparation terminado: {country}")
 print(response)
 

@@ -24,6 +24,9 @@ country = dbutils.widgets.get("country")
 dbutils.widgets.text("table_results", '')
 table_results = dbutils.widgets.get("table_results")
 
+dbutils.widgets.text("column_names_dict_path", '')
+column_names_dict_path = dbutils.widgets.get("column_names_dict_path")
+
 dbutils.widgets.text("lang", '')
 lang = dbutils.widgets.get("lang")
 
@@ -42,24 +45,24 @@ def pipeline_driver(author_fpath, lang):
 
     if(country != "japan"):
 
-        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.0/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
-            'author_model_dir': author_models[lang],
+        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.1/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
+            'model_name': author_models[lang],
             'input_file_path': author_fpath,
             'output_file_path': author_fpath,
             'channel_column': "channel",
             'lang': lang,
-            'tf_version': "2.8.0",
+            "column_names_dict_path": column_names_dict_path
         })
 
     else:
 
         return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.0/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
-            'author_model_dir': author_models[lang],
+            'model_name': author_models[lang],
             'database': "default",
             'table': f"japan_temporal_results_{d4}",
             'channel_column': "channel",
             'lang': lang,
-            'tf_version': "2.8.0",
+            'column_names_dict_path': column_names_dict_path
         })
 
 
@@ -116,8 +119,10 @@ for col in result_dataframe.columns:
 if 'Unnamed: 0' in result_dataframe:
     result_dataframe = result_dataframe.drop('Unnamed: 0', axis=1)
 
-result_dataframe_ultra = result_dataframe[["SN_MSG_ID", "channel", "Created_Time", "Month", "Year", "username", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel",
-                                           "Sentiment", "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"]]
+
+result_dataframe_ultra = result_dataframe[["SN_MSG_ID", "Created_Time", "Month", "Year", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel",
+                                           "Sentiment", "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"] + column_names_dict_path.values()
+                                          ]
 print(result_dataframe_ultra.shape)
 display(result_dataframe_ultra.head(3))
 
@@ -135,8 +140,9 @@ else:
 
     old_df = spark.sql(
         f"SELECT * from author_weekly.{table_results}").toPandas()
-    old_df = old_df[["SN_MSG_ID", "channel", "Created_Time", "Month", "Year", "username", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel", "Sentiment",
-                    "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"]]
+    old_df = old_df[["SN_MSG_ID", "Created_Time", "Month", "Year", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel",
+                     "Sentiment", "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"] + column_names_dict_path.values()
+                    ]
     print(old_df.shape)
 
     new_data = pd.concat([result_dataframe_ultra, old_df])

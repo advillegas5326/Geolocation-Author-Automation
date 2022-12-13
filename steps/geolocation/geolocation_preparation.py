@@ -18,7 +18,7 @@ print(geolocation_fpath)
 
 
 def data_preparation():
-    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/geolocation_data_prep/geolocation_data_prep', timeout_seconds=0, arguments={
+    return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.2/source/geolocation_data_prep/geolocation_data_prep', timeout_seconds=0, arguments={
         'input_file_path': geolocation_fpath,
         'output_file_path': geolocation_fpath,
         'user_column_name': 'SenderUserId',
