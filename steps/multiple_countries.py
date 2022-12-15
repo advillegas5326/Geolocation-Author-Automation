@@ -40,6 +40,9 @@ get_data = dbutils.widgets.get("get_data")
 dbutils.widgets.text("execution", '')
 execution = dbutils.widgets.get("execution")
 
+dbutils.widgets.text("hidrated", 'False')
+hidrated = dbutils.widgets.get("hidrated")
+
 # COMMAND ----------
 
 # MAGIC %md ##Functions
@@ -279,6 +282,7 @@ else:
             'geolocation_table_results': country[1][3],
             'author_table_results': country[0][3],
             "execution": execution,
+            'hidrated': hidrated,
         })
     send_to_api(data)
 

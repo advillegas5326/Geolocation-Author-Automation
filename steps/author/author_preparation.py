@@ -2,6 +2,7 @@
 import pandas as pd
 import requests
 from datetime import date
+import calendar
 
 # COMMAND ----------
 
@@ -22,6 +23,7 @@ def data_preparation():
 
     today = date.today()
     d4 = today.strftime("%b_%d_%Y")
+    month_num = today.month
 
     if(country != "japan"):
 
@@ -38,7 +40,7 @@ def data_preparation():
 
         return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
             'database': "pei",
-            'table': "japan_full_data_table_november",
+            'table': f"japan_full_data_table_{calendar.month_name[month_num].lower()}",
             'output_table': f"japan_temporal_results_{d4}",
             'user_column_name': 'SenderUserId',
             'channel_column_name': 'Message_Type',
