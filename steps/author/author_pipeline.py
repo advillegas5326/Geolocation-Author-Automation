@@ -12,6 +12,7 @@ import pandas as pd
 from delta.tables import *
 import requests
 from datetime import date
+import json
 
 # COMMAND ----------
 
@@ -115,6 +116,15 @@ else:
     result_dataframe = spark.sql(f"SELECT * FROM {pipeline_result}").toPandas()
 # COMMAND ----------
 
+with open(column_names_dict_path, "r") as file:
+    data = file.readline()
+    _dict = json.loads(data)
+    print(_dict)
+
+new_dict = {}
+for key in _dict:
+    new_dict[_dict[key]] = key
+
 # Get Result
 for col in result_dataframe.columns:
     result_dataframe[col] = result_dataframe[col].astype(str)
@@ -123,7 +133,7 @@ if 'Unnamed: 0' in result_dataframe:
 
 
 result_dataframe_ultra = result_dataframe[["SN_MSG_ID", "Created_Time", "Month", "Year", "followers_count", "friends_count", "Brand", "Quarter", "Market", "Theme", "Category", "Funnel",
-                                           "Sentiment", "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"] + column_names_dict_path.values()
+                                           "Sentiment", "Country", "Author_Predictions", "user_uid", "engagement_avg", "author_prediction_ori", "author_prediction", "author_prediction2", "influencer_prediction", "prediction", "prediction2"] + list(new_dict.values())
                                           ]
 print(result_dataframe_ultra.shape)
 display(result_dataframe_ultra.head(3))

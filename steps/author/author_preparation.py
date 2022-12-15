@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 from datetime import date
 import calendar
+import json
 
 # COMMAND ----------
 
@@ -80,8 +81,18 @@ except Exception as e:
 
 # COMMAND ----------
 
-response = send_to_api({"author_fpath": prepairing_result["output_file_path"],
-                       "column_names_dict_path": prepairing_result["column_names_dict_path"], "country": country})
+if country != "japan":
+    api_data = {"author_fpath": prepairing_result["output_file_path"],
+                "column_names_dict_path": prepairing_result["column_names_dict_path"], "country": country}
+else:
+    api_data = {"author_fpath": prepairing_result["output_table"],
+                "column_names_dict_path": prepairing_result["column_names_dict_path"], "country": country}
+
+# COMMAND ----------
+
+prepairing_result = json.loads(str(prepairing_result).replace("'", '"'))
+response = send_to_api(
+    {"column_names_dict_path": prepairing_result["column_names_dict_path"], "country": country})
 send_telegram_error(f"Author preparation terminado: {country}")
 print(response)
 
