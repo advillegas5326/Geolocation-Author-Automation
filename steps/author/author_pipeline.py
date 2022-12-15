@@ -43,8 +43,8 @@ def pipeline_driver(author_fpath, lang):
     today = date.today()
     d4 = today.strftime("%b_%d_%Y")
 
-    author_models = {"jp": 'author_model_v0.8.2_ja', "de": 'author_model_v0.8.3_de_v0.4.0', "en": 'author_model_v0.8.3_en_v0.7.5', "it": 'author_model_v0.8.3_it_v1.6',
-                     "ru": 'author_model_v0.8.3_ru_v0.8.2', "fr": 'french_v0.4.0_v1.2', "es": 'spanish_v0.4.0_v1.4', "sw": 'swedish_v0_4_0_v2', "kr": 'korean_v0.4.0_v8', "pt": 'author_model_v0.8.3_en_v0.7.5'}
+    author_models = {"jp": 'author_japanese', "de": 'author_germany', "en": 'author_english', "it": 'author_italian',
+                     "ru": 'author_russian', "fr": 'author_french', "es": 'author_spanish', "sw": 'author_swedish', "kr": 'author_korean', "pt": 'author_spanish'}
 
     if(country != "japan"):
 
