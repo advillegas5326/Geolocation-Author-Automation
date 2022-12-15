@@ -81,7 +81,7 @@ except Exception as e:
 # COMMAND ----------
 
 response = send_to_api({"author_fpath": prepairing_result["output_file_path"],
-                       "column_names_dict_path": prepairing_result["dict_path"], "country": country})
+                       "column_names_dict_path": prepairing_result["column_names_dict_path"], "country": country})
 send_telegram_error(f"Author preparation terminado: {country}")
 print(response)
 

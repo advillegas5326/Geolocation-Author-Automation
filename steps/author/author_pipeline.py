@@ -30,6 +30,9 @@ column_names_dict_path = dbutils.widgets.get("column_names_dict_path")
 dbutils.widgets.text("lang", '')
 lang = dbutils.widgets.get("lang")
 
+dbutils.widgets.text("experiment_name", '')
+experiment_name = dbutils.widgets.get("experiment_name")
+
 # COMMAND ----------
 
 # Functions
@@ -48,10 +51,9 @@ def pipeline_driver(author_fpath, lang):
         return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.1/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
             'model_name': author_models[lang],
             'input_file_path': author_fpath,
-            'output_file_path': author_fpath,
-            'channel_column': "channel",
             'lang': lang,
-            "column_names_dict_path": column_names_dict_path
+            "column_names_dict_path": column_names_dict_path,
+            "experiment_name": experiment_name
         })
 
     else:
@@ -60,9 +62,9 @@ def pipeline_driver(author_fpath, lang):
             'model_name': author_models[lang],
             'database': "default",
             'table': f"japan_temporal_results_{d4}",
-            'channel_column': "channel",
             'lang': lang,
-            'column_names_dict_path': column_names_dict_path
+            'column_names_dict_path': column_names_dict_path,
+            "experiment_name": experiment_name
         })
 
 
