@@ -58,7 +58,7 @@ def pipeline_driver(author_fpath, lang):
 
     else:
 
-        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.0/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
+        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/Author/v1.1/source/inference/Pipeline_driver', timeout_seconds=0, arguments={
             'model_name': author_models[lang],
             'database': "default",
             'table': f"japan_temporal_results_{d4}",

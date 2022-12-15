@@ -38,7 +38,7 @@ def data_preparation():
 
     else:
 
-        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.1/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
+        return dbutils.notebook.run(path='/Users/nick_altgelt@bat.com/DIF/v1.2/source/author_data_prep/author_data_prep', timeout_seconds=0, arguments={
             'database': "pei",
             'table': f"japan_full_data_table_{calendar.month_name[month_num].lower()}",
             'output_table': f"japan_temporal_results_{d4}",
